@@ -92,7 +92,8 @@ class GameState:
         data_row['current_player'] = 1 if self.current_player == 1 else 0
         data_row['turns_played'] = self.turns_played
 
-        return pd.DataFrame([data_row])
+        # return pd.DataFrame([data_row])
+        return data_row
 
         
 

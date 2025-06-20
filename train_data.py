@@ -36,13 +36,16 @@ def create_game_state(moves):
 
 
 
-def produce_training_data():
+def produce_training_data(N=100000):
     """
     Produce training data from the game data.
     """
-    training_data = pd.DataFrame()
+    # training_data = pd.DataFrame()
+    rows = []
 
-    for i, row in game_data.iterrows():
+    for _ in range(N):
+        i = random.randint(0, len(game_data) - 1)
+        row = game_data.iloc[i] 
         moves = row['moves']
 
         # cut moves at a random point to simulate mid-game states
@@ -54,13 +57,22 @@ def produce_training_data():
 
         # Get the feature representation of the game state
         features = game_state.to_features() # features is a pd.DataFrame
-        features['winner'] = 1 if row['winner'] == 'white' else 0
+        if row['winner'] == 'white':
+            features['winner'] = 1
+        elif row['winner'] == 'black':
+            features['winner'] = -1
+        else:
+            features['winner'] = 0
+
 
         # Append the features to the training data
-        training_data = pd.concat([training_data, features], ignore_index=True)
+        # training_data = pd.concat([training_data, features], ignore_index=True)
+        rows.append(features)
 
-        if (i + 1) % 100 == 0:
-            print(f'Processed game {i + 1}/{len(game_data)}')
+        if (_ + 1) % 100 == 0:
+            print(f'Processed game {_ + 1}/{N}')
+
+    training_data = pd.DataFrame(rows)
 
     training_data.reset_index(drop=True, inplace=True)
     return training_data
