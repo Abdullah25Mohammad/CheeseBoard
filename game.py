@@ -94,6 +94,42 @@ class GameState:
 
         # return pd.DataFrame([data_row])
         return data_row
+    
+    def channelize(self):
+        """
+        Converts the current game state to a 12-channel representation.
+        Each piece type has its own channel, with 1 for presence and 0 for absence.
+        """
+        channels = np.zeros((8, 8, 12), dtype=np.uint8)
+
+        # One hot encode to a 12 channel representation
+        X_flat = self.board
+        channel_map = {
+            0: -1,  # Empty square
+            1: 0,   # White Pawn
+            2: 1,   # White Knight
+            3: 2,   # White Bishop
+            4: 3,   # White Rook
+            5: 4,   # White Queen
+            6: 5,   # White King
+           -1: 6,   # Black Pawn
+           -2: 7,   # Black Knight
+           -3: 8,   # Black Bishop
+           -4: 9,   # Black Rook
+           -5: 10,  # Black Queen
+           -6: 11   # Black King
+        }
+
+        for piece_val, channel_idx in channel_map.items():
+            if channel_idx == -1:
+                continue  # skip empty squares
+            mask = (X_flat == piece_val)
+            channels[:, :, channel_idx][mask] = 1
+        
+        channels = np.expand_dims(channels, axis=0)
+
+        return channels
+
 
         
 
